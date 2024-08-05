@@ -11,7 +11,7 @@ export default function ModuleRoutes(app) {
         res.sendStatus(204);
     });
 
-    app.delete("/api/modules/:mid", (req, res) => {
+   app.delete("/api/modules/:mid", (req, res) => {
         const { mid } = req.params;
         db.modules = db.modules.filter((m) => m._id !== mid);
         res.sendStatus(200);
@@ -29,7 +29,7 @@ export default function ModuleRoutes(app) {
     });
 
     app.get("/api/courses/:cid/modules", (req, res) => {
-        const { cid } = req.params;
+        const { cid }  = req.params;
         const modules = db.modules.filter((m) => m.course === cid);
         res.json(modules);
     });
