@@ -47,7 +47,7 @@ export default function UserRoutes(app) {
         const user = await dao.findUserByUsername(req.body.username);
         if (user) {
             res.status(400).json(
-                { message: "Username already taken" });
+                { message: "Username already taken. Form Server" });
             return;
         }
         const currentUser = await dao.createUser(req.body);
@@ -63,7 +63,7 @@ export default function UserRoutes(app) {
             req.session["currentUser"] = currentUser;
             res.json(currentUser);
         } else {
-            res.status(401).json({ message: "Unable to login. Try again later." });
+            res.status(401).json({ message: "Unable to login. Try again later. Form Server" });
         }
     };
 
