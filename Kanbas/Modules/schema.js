@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const moduleSchema = new mongoose.Schema({
     name: String,
     description: String,
-    course: String,
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
     lessons: [
       {
         name: String,
