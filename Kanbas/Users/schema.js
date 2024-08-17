@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+
+// Assuming you have a Course model based on courseSchema
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -12,11 +14,15 @@ const userSchema = new mongoose.Schema({
         default: "USER",
     },
     loginId: String,
-    section: String,
+    Section: [{ 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Course',  
+        default: null   
+    }],
     lastActivity: Date,
     totalActivity: String,
 },
     { collection: "users" }
 );
-export default userSchema;
 
+export default userSchema;
