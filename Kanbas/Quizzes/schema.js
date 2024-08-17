@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Question from "../Questions/model.js"; 
 
 const quizSchema = new mongoose.Schema({
     title: {
@@ -72,34 +73,6 @@ const quizSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    questions: [
-        {
-            type: {
-                type: String,
-                enum: ['Multiple Choice', 'True/False', 'Fill in the Blank'],
-                required: true
-            },
-            title: {
-                type: String,
-                required: true
-            },
-            points: {
-                type: Number,
-                required: true
-            },
-            questionText: {
-                type: String,
-                required: true
-            },
-            choices: [
-                {
-                    text: String,
-                    correct: Boolean,
-                }
-            ],
-            correctAnswer: String, // For True/False and Fill in the Blank
-        }
-    ],
     course: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Course',
@@ -109,8 +82,21 @@ const quizSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-},
-    { collection: "quizzes" }
-);
+}, {
+    collection: "quizzes"
+});
+
+// Middleware to calculate the total points before saving the quiz
+quizSchema.pre('save', async function(next) {
+    const questions = await Question.find({ quiz: this._id });
+
+    if (questions && questions.length > 0) {
+        this.points = questions.reduce((sum, question) => sum + (question.points || 0), 0);
+    } else {
+        this.points = 0;
+    }
+
+    next();
+});
 
 export default quizSchema;
