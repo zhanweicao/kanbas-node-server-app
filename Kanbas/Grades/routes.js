@@ -16,8 +16,6 @@ export default function GradeRoutes(app) {
     };
     app.put("/api/courses/:cid/quiz/:qid/grades/:gid", updateGrade);
 
-    // "localhost:4000/api/courses/:cid/quizzes/qid/grades/gid"
-
     const deleteGrade = async (req, res) => {
         const { gid } = req.params;
         console.log(`Deleting grade with ID: ${gid}`); // Log the grade ID
@@ -32,28 +30,38 @@ export default function GradeRoutes(app) {
     app.delete("/api/courses/:cid/grades/:gid", deleteGrade);
 
     const createGrade = async (req, res) => {
-        console.log(req.session)
-        const user = req.session?.currentUser?._id
-        const { qid } = req.params; // Extract courseId from URL
-        const answers = req.body;
-        const gradeDoc = new Grade({
-          quiz: qid,
-          user,
-          answers,
-          attempt: {
-            score: await dao.gradeAnswer(answers)
-          }
-        })
-        console.log("Creating grade with data:", gradeDoc); // Log the data being created
-
+        const user = req.session?.currentUser?._id;
+        const { qid } = req.params; // Extract quiz ID from URL
+        const answers = req.body.answers; // Extract answers from the request body
+        
+        console.log("Received answers:", answers); // Log received answers
+    
+        if (!answers || !Array.isArray(answers)) {
+            return res.status(400).json({ error: "Answers array is missing or invalid" });
+        }
+    
+        const score = await dao.gradeAnswer(answers); // Calculate the score
+    
+        const gradeData = {
+            quiz: qid,
+            user,
+            attempt: {
+                score,
+                answers, // Store the answers in the attempt
+            }
+        };
+    
+        console.log("Creating grade with data:", gradeData); // Log the data being created
+    
         try {
-            const grade = await dao.createGrade(gradeDoc);
+            const grade = await dao.createGrade(gradeData);
             res.json(grade);
         } catch (error) {
             console.error("Error creating grade:", error); // Log the error if creation fails
             res.status(500).json({ error: error.message });
         }
     };
+    
     app.post("/api/courses/:cid/quizzes/:qid/grades", createGrade);
 
     const findGradesByCourseId = async (req, res) => {
@@ -85,5 +93,4 @@ export default function GradeRoutes(app) {
         }
     };
     app.get("/api/courses/:cid/grades/:gid", findGradeById);
-
 }

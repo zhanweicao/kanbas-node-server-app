@@ -12,13 +12,6 @@ const gradeSchema = new mongoose.Schema({
         required: true
     },
     attempt: {
-        // answer: [{
-        //   question: {
-        //     type: mongoose.Schema.Types.ObjectId,
-        //     ref: 'questionModel'
-        //   }, 
-        //   value: String | Boolean
-        // }],
         score: {
             type: Number,
             required: true
@@ -30,7 +23,15 @@ const gradeSchema = new mongoose.Schema({
         attemptCount: {
             type: Number,
             default: 1
-        }
+        },
+        answers: [{
+            question: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Question', // Link to the Question schema
+                required: true
+            },
+            value: mongoose.Schema.Types.Mixed // Can be String (for text answers) or Boolean (for true/false)
+        }],
     }
 }, {
     collection: "grades"

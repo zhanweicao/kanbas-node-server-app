@@ -4,7 +4,7 @@ import Question from "../Questions/model.js";
 // Function to create a grade and increment attempt count
 export const createGrade = async (gradeData) => {
   try {
-    // Find the latest grade for the same user and quiz
+
     const latestGrade = await Grade.findOne({
       user: gradeData.user,
       quiz: gradeData.quiz
@@ -12,21 +12,22 @@ export const createGrade = async (gradeData) => {
 
     console.log("Latest Grade:", latestGrade); // Add this log to debug
 
-    // Determine the new attempt count
+
     let attemptCount = 1;
     if (latestGrade) {
       attemptCount = latestGrade.attempt.attemptCount + 1;
       console.log("New Attempt Count:", attemptCount); // Log new attempt count
     }
 
-    // Create the new grade with the incremented attempt count
+
     const newGrade = new Grade({
       user: gradeData.user,
       quiz: gradeData.quiz,
       attempt: {
         score: gradeData.attempt.score,
-        attemptCount: attemptCount,  // Correct spelling
-        attemptDate: gradeData.attempt.attemptDate || Date.now()
+        attemptCount: attemptCount,  
+        attemptDate: gradeData.attempt.attemptDate || Date.now(),
+        answers: gradeData.attempt.answers,
       }
     });
 
@@ -56,27 +57,37 @@ export const deleteGrade = (gradeId) => {
 };
 
 // Function to grade an answer
-export const gradeAnswer = async (answer) => {
-  let points = 0;
-  const promise = answer.map(ans => Question.findById(ans.question).exec());
-  const questions = await Promise.all(promise);
-  answer.forEach((ans, index) => {
-    const { value } = ans;
-    const question = questions[index].toObject();
+export const gradeAnswer = async (answers) => {
+  if (!answers || !Array.isArray(answers) || answers.length === 0) {
+      console.error("Answers array is missing or empty");
+      throw new Error("Answers array is missing or empty");
+  }
 
-    if (question.type === 'True/False') {
-      points += question.trueFalseAnswer === value ? question.points : 0;
-      return;
-    }
-    if (question.type === 'Multiple Choice') {
-      const correctAnswer = question.choices.find(c => c.correct);
-      points += correctAnswer.text === value ? question.points : 0;
-      return;
-    }
-    if (question.type === 'Fill in the Blank') {
-      points += question.fillInBlankAnswers.includes(value) ? question.points : 0;
-      return;
-    }
+  console.log("Grading answers:", answers); // Log the answers being graded
+
+  let points = 0;
+  const promise = answers.map(ans => Question.findById(ans.question).exec());
+  const questions = await Promise.all(promise);
+  
+  answers.forEach((ans, index) => {
+      const { value } = ans;
+      const question = questions[index].toObject();
+
+      if (question.type === 'True/False') {
+          points += question.trueFalseAnswer === value ? question.points : 0;
+          return;
+      }
+      if (question.type === 'Multiple Choice') {
+          const correctAnswer = question.choices.find(c => c.correct);
+          points += correctAnswer.text === value ? question.points : 0;
+          return;
+      }
+      if (question.type === 'Fill in the Blank') {
+          points += question.fillInBlankAnswers.includes(value) ? question.points : 0;
+          return;
+      }
   });
+
   return points;
 };
+
