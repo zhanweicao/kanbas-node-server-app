@@ -14,7 +14,7 @@ export default function GradeRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     };
-    app.put("/api/courses/:cid/quiz/:qid/grades/:gid", updateGrade);
+    app.put("/api/courses/:cid/quizzes/:qid/grades/:gid", updateGrade);
 
     const deleteGrade = async (req, res) => {
         const { gid } = req.params;
@@ -27,7 +27,7 @@ export default function GradeRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     };
-    app.delete("/api/courses/:cid/grades/:gid", deleteGrade);
+    app.delete("/api/courses/:cid/quizzes/:qid/grades/:gid", deleteGrade);
 
     const createGrade = async (req, res) => {
         const user = req.session?.currentUser?._id;
@@ -78,13 +78,14 @@ export default function GradeRoutes(app) {
     app.get("/api/courses/:cid/grades", findGradesByCourseId);
 
     const findGradeById = async (req, res) => {
-        const { gid } = req.params;
-        console.log(`Finding grade with ID: ${gid}`); // Log the grade ID
+        console.log(`Attempting to find grade with ID: ${req.params.gid}`); // Log when the function is called
         try {
-            const grade = await dao.findGradeById(gid);
+            const grade = await dao.findGradeById(req.params.gid);
             if (grade) {
+                console.log("Grade found:", grade);
                 res.json(grade);
             } else {
+                console.log("Grade not found");
                 res.status(404).json({ error: "Grade not found" });
             }
         } catch (error) {
@@ -92,5 +93,6 @@ export default function GradeRoutes(app) {
             res.status(500).json({ error: error.message });
         }
     };
-    app.get("/api/courses/:cid/grades/:gid", findGradeById);
+    
+    app.get("/api/courses/:cid/quizzes/:qid/grades/:gid", findGradeById);
 }
