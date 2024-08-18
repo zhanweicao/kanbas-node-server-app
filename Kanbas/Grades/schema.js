@@ -27,7 +27,7 @@ const gradeSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         },
-        attemptCout: {
+        attemptCount: {
             type: Number,
             default: 1
         }

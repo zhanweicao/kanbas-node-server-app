@@ -5,7 +5,8 @@ import Quiz from '../Quizzes/model.js';
 const updateQuizPoints = async (quizId) => {
     const questions = await Question.find({ quiz: quizId });
     const totalPoints = questions.reduce((sum, question) => sum + question.points, 0);
-    await Quiz.updateOne({ _id: quizId }, { $set: { points: totalPoints } });
+    const numberOfQuestions = questions.length;
+    await Quiz.updateOne({ _id: quizId }, { $set: { points: totalPoints, numberOfQuestions } });
 };
 
 export const createQuestion = async (question) => {

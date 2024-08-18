@@ -19,6 +19,10 @@ const quizSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    numberOfQuestions: {
+        type: Number,
+        default: 0
+    },
     assignmentGroup: {
         type: String,
         enum: ['Quiz', 'Exam', 'Assignment', 'Project'],
