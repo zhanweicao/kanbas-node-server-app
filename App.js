@@ -11,6 +11,7 @@ import AssignmentRoutes from './Kanbas/Assignment/routes.js';
 import UserRoutes from "./Kanbas/Users/routes.js";
 import QuizRoutes from "./Kanbas/Quizzes/routes.js";
 import QuestionRoutes from "./Kanbas/Questions/routes.js";
+import GradeRoutes from "./Kanbas/Grades/routes.js";
 const app = express()
 app.use(cors({
     credentials: true,
@@ -35,12 +36,13 @@ app.use(session(sessionOptions));
 const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kanbas"
 mongoose.connect(CONNECTION_STRING);
 app.use(express.json());
+UserRoutes(app);
 CourseRoutes(app);
 ModuleRoutes(app);
 AssignmentRoutes(app);
 QuestionRoutes(app);
 QuizRoutes(app);
-UserRoutes(app);
+GradeRoutes(app);
 Lab5(app);
 Hello(app);
 app.listen(process.env.PORT || 4000)

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Question from "../Questions/model.js"; 
 
 const quizSchema = new mongoose.Schema({
     title: {
@@ -84,19 +83,6 @@ const quizSchema = new mongoose.Schema({
     }
 }, {
     collection: "quizzes"
-});
-
-// Middleware to calculate the total points before saving the quiz
-quizSchema.pre('save', async function(next) {
-    const questions = await Question.find({ quiz: this._id });
-
-    if (questions && questions.length > 0) {
-        this.points = questions.reduce((sum, question) => sum + (question.points || 0), 0);
-    } else {
-        this.points = 0;
-    }
-
-    next();
 });
 
 export default quizSchema;

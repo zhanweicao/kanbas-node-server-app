@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
         default: "USER",
     },
     loginId: String,
-    Section: [{ 
+    section: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Course',  
         default: null   

@@ -1,4 +1,6 @@
 import * as dao from "./dao.js";
+import * as userDao from '../Users/dao.js'
+import User from '../Users/model.js'
 import Database from "../Database/index.js";
 export default function CourseRoutes(app) {
 
@@ -21,6 +23,23 @@ export default function CourseRoutes(app) {
 
     const createCourse = async (req, res) => {
         const course = await dao.createCourse(req.body);
+
+        const currentUser = req.session['currentUser']
+        const user = await userDao.findUserById(currentUser._id)
+        const alreadyCreated = user.toObject().section
+  
+        const dedupedSection = [...new Set([...alreadyCreated, course._id])]
+        const newUser = new User({
+          _id: currentUser._id,
+          section: dedupedSection,
+          username: currentUser.username,
+          password: currentUser.password,
+          firstName: currentUser.firstName,
+          lastName: currentUser.lastName,
+          email: currentUser.email,
+          role: currentUser.role,
+        })
+        await userDao.updateUser(user._id, newUser)
         res.json(course);
     };
     app.post("/api/courses", createCourse);

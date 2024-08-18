@@ -1,16 +1,5 @@
 import mongoose from "mongoose";
 
-const attemptSchema = new mongoose.Schema({
-    score: {
-        type: Number,
-        required: true
-    },
-    attemptDate: {
-        type: Date,
-        default: Date.now
-    }
-});
-
 const gradeSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -22,7 +11,14 @@ const gradeSchema = new mongoose.Schema({
         ref: 'quizModel',
         required: true
     },
-    attempts: {
+    attempt: {
+        // answer: [{
+        //   question: {
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: 'questionModel'
+        //   }, 
+        //   value: String | Boolean
+        // }],
         score: {
             type: Number,
             required: true

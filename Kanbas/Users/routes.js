@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import * as dao from "./dao.js";
+import User from '../Users/model.js'
 // let currentUser = null;
 export default function UserRoutes(app) {
     const findAllUsers = async (req, res) => {
@@ -80,9 +82,33 @@ export default function UserRoutes(app) {
             res.sendStatus(401);
             return;
         }
-
-        res.json(currentUser);
+        const user = await dao.findUserById(currentUser._id)
+        res.json(user);
     };
+
+    const enroll = async (req, res) => {
+      console.log('enroll')
+      const currentUser = req.session['currentUser']
+      console.log(req.body, currentUser)
+      const { course } = req.body
+      const user = await dao.findUserById(currentUser._id)
+      const alreadyEnrolled = user.toObject().section
+
+      const dedupedSection = [...new Set([...alreadyEnrolled, course])]
+      const newUser = new User({
+        _id: currentUser._id,
+        section: dedupedSection,
+        username: currentUser.username,
+        password: currentUser.password,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        email: currentUser.email,
+        role: currentUser.role,
+      })
+      console.log(newUser.toObject())
+      await dao.updateUser(currentUser._id, newUser)
+      res.sendStatus(200)
+    }
 
     app.post("/api/users", createUser);
     app.get("/api/users", findAllUsers);
@@ -93,5 +119,5 @@ export default function UserRoutes(app) {
     app.post("/api/users/signin", signin);
     app.post("/api/users/signout", signout);
     app.post("/api/users/profile", profile);
+    app.put("/api/users/:userId/enroll", enroll)
 }
-
