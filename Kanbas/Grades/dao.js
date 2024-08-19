@@ -90,4 +90,6 @@ export const gradeAnswer = async (answers) => {
 
   return points;
 };
-
+export const findLatestGradeForQuiz = async (quizId, userId) => {
+  return Grade.findOne({ quiz: quizId, user: userId }).sort({ 'attempt.attemptCount': -1 });
+};
